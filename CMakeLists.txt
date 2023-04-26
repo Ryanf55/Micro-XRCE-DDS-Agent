@@ -109,6 +109,7 @@ if(UAGENT_LOGGER_PROFILE)
         set(_spdlog_version 1.9.2)
         set(_spdlog_tag v1.9.2)
     endif()
+    message("spdlog version:" ${_spdlog_version})
     list(APPEND _deps "spdlog\;${_spdlog_version}")
 endif()
 
@@ -150,7 +151,18 @@ foreach(d ${_deps})
     list(GET d 0 _name)
     list(GET d 1 _version)
     set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} ${PROJECT_BINARY_DIR}/temp_install/${_name}-${_version})
-    find_package(${_name} ${_version} REQUIRED)
+
+    
+    string(FIND "${d}" "spd" found_spd_str)
+    # message("DEP:" ${found_spd_str} ${d})
+    if(${found_spd_str} EQUAL 0)
+        message("Debugging cmake find of spdlog")
+        set(CMAKE_FIND_DEBUG_MODE TRUE)
+        find_package(${_name} ${_version} REQUIRED)
+        set(CMAKE_FIND_DEBUG_MODE FALSE)
+    else()
+        find_package(${_name} ${_version} REQUIRED)
+    endif()
 endforeach()
 
 ###############################################################################
